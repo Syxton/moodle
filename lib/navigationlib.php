@@ -1130,9 +1130,14 @@ class global_navigation extends navigation_node {
         } else {
             $this->rootnodes['courses']->isexpandable = true;
         }
-
-        if ($this->rootnodes['mycourses']->isactive) {
-            $this->load_courses_enrolled();
+        
+        if (empty($CFG->navcollapsemycourses)){
+            if ($this->rootnodes['mycourses']->isactive) {
+                $this->load_courses_enrolled();
+            }
+        } else {  
+            $this->rootnodes['mycourses']->collapse = true; 
+            $this->rootnodes['mycourses']->make_inactive(); 
         }
 
         $canviewcourseprofile = true;
@@ -2228,7 +2233,7 @@ class global_navigation extends navigation_node {
         // Add a node to view the users notes if permitted
         if (!empty($CFG->enablenotes) && has_any_capability(array('moodle/notes:manage', 'moodle/notes:view'), $coursecontext)) {
             $url = new moodle_url('/notes/index.php',array('user'=>$user->id));
-            if ($coursecontext->instanceid != SITEID) {
+            if ($coursecontext->instanceid) {
                 $url->param('course', $coursecontext->instanceid);
             }
             $usernode->add(get_string('notes', 'notes'), $url);
