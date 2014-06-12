@@ -4685,9 +4685,6 @@ class assign {
 
         $late = $instance->duedate && ($instance->duedate < time());
 
-        $cm = get_coursemodule_from_instance('assign', $instance->id, 0, false, MUST_EXIST);
-        $context = context_module::instance($cm->id);
-        
         if (!$instance->sendnotifications && !($late && $instance->sendlatenotifications)) {
             // No need to do anything.
             return;
@@ -4700,7 +4697,7 @@ class assign {
         }
         if ($teachers = $this->get_graders($user->id)) {
             foreach ($teachers as $teacher) {
-                if (has_capability('mod/assign:receivegradernotifications', $context, $teacher->id)) {
+                if (has_capability('mod/assign:receivegradernotifications', $this->get_context(), $teacher->id)) {
                     $this->send_notification($user,
                                          $teacher,
                                          'gradersubmissionupdated',
