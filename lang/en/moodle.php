@@ -523,6 +523,7 @@ $string['doyouagree'] = 'Have you read these conditions and understood them?';
 $string['droptoupload'] = 'Drop files here to upload';
 $string['duplicate'] = 'Duplicate';
 $string['duplicateconfirm'] = 'Are you sure you want to duplicate {$a->modtype} \'{$a->modname}\' ?';
+$string['duplicateconfirmnoname'] = 'Are you sure you want to duplicate this {$a->modtype} ?';
 $string['duplicatecontcourse'] = 'Return to the course';
 $string['duplicatecontedit'] = 'Edit the new copy';
 $string['duplicatesuccess'] = '{$a->modtype} \'{$a->modname}\' has been duplicated successfully';

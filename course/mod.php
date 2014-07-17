@@ -100,7 +100,7 @@ if (!empty($add)) {
 
         echo $OUTPUT->header();
         echo $OUTPUT->confirm(
-            get_string('duplicateconfirm', 'core', $a),
+            get_string('duplicateconfirmnoname', 'core', $a),
             new single_button(
                 new moodle_url('/course/modduplicate.php', array(
                     'cmid' => $cm->id, 'course' => $course->id, 'sr' => $sectionreturn)),

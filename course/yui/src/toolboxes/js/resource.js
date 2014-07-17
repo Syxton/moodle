@@ -301,7 +301,7 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
     },
 
     /**
-     * Duplicates the activity.
+     * Duplicates the activity or resource after confirmation.
      *
      * @method duplicate
      * @protected
@@ -311,35 +311,58 @@ Y.extend(RESOURCETOOLBOX, TOOLBOX, {
      * @chainable
      */
     duplicate: function(ev, button, activity) {
-        // Prevent the default button action
+        // Prevent the default button action.
         ev.preventDefault();
 
-        // Get the element we're working on
-        var element = activity;
+        // Get the element we're working on.
+        var element   = activity,
+            // Create confirm string (different if element has or does not have name).
+            confirmstring = '',
+            plugindata = {
+                modtype: M.util.get_string('pluginname', element.getAttribute('class').match(/modtype_([^\s]*)/)[1])
+            };
+        if (Y.Moodle.core_course.util.cm.getName(element) !== null) {
+            plugindata.modname = Y.Moodle.core_course.util.cm.getName(element);
+            confirmstring = M.util.get_string('duplicateconfirm', 'moodle', plugindata);
+        } else {
+            confirmstring = M.util.get_string('duplicateconfirmnoname', 'moodle', plugindata);
+        }
 
-        // Add the lightbox.
-        var section = activity.ancestor(M.course.format.get_section_selector(Y)),
-            lightbox = M.util.add_lightbox(Y, section).show();
-
-        // Build and send the request.
-        var data = {
-            'class': 'resource',
-            'field': 'duplicate',
-            'id': Y.Moodle.core_course.util.cm.getId(element),
-            'sr': button.getData('sr')
-        };
-        this.send_request(data, lightbox, function(response) {
-            var newcm = Y.Node.create(response.fullcontent);
-
-            // Append to the section?
-            activity.insert(newcm, 'after');
-            Y.use('moodle-course-coursebase', function() {
-                M.course.coursebase.invoke_function('setup_for_resource', newcm);
-            });
-            if (M.core.actionmenu && M.core.actionmenu.newDOMNode) {
-                M.core.actionmenu.newDOMNode(newcm);
-            }
+        // Create the confirmation dialogue.
+        var confirm = new M.core.confirm({
+            question: confirmstring,
+            modal: true
         });
+
+        // If it is confirmed.
+        confirm.on('complete-yes', function() {
+
+            // Add the lightbox.
+            var section = activity.ancestor(M.course.format.get_section_selector(Y)),
+                lightbox = M.util.add_lightbox(Y, section).show();
+
+            // Build and send the request.
+            var data = {
+                'class': 'resource',
+                'field': 'duplicate',
+                'id': Y.Moodle.core_course.util.cm.getId(element),
+                'sr': button.getData('sr')
+            };
+            this.send_request(data, lightbox, function(response) {
+                var newcm = Y.Node.create(response.fullcontent);
+
+                // Append to the section?
+                activity.insert(newcm, 'after');
+                Y.use('moodle-course-coursebase', function() {
+                    M.course.coursebase.invoke_function('setup_for_resource', newcm);
+                });
+                if (M.core.actionmenu && M.core.actionmenu.newDOMNode) {
+                    M.core.actionmenu.newDOMNode(newcm);
+                }
+            });
+
+        }, this);
+
         return this;
     },
 

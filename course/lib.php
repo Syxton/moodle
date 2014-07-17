@@ -3256,6 +3256,8 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
             'moveleft',
             'deletechecktype',
             'deletechecktypename',
+            'duplicateconfirm',
+            'duplicateconfirmnoname',
             'edittitle',
             'edittitleinstructions',
             'show',

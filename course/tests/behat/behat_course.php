@@ -241,7 +241,6 @@ class behat_course extends behat_base {
     public function i_show_section($sectionnumber) {
         $showlink = $this->show_section_icon_exists($sectionnumber);
         $showlink->click();
-
         if ($this->running_javascript()) {
             $this->getSession()->wait(self::TIMEOUT * 1000, self::PAGE_READY_JS);
             $this->i_wait_until_section_is_available($sectionnumber);
@@ -726,14 +725,20 @@ class behat_course extends behat_base {
     public function i_duplicate_activity($activityname) {
         $steps = array();
         $activity = $this->escape($activityname);
+
+        // JS enabled.
+        // Not using chain steps here because the exceptions catcher have problems detecting
+        // JS modal windows and avoiding interacting them at the same time.
         if ($this->running_javascript()) {
             $steps[] = new Given('I open "' . $activity . '" actions menu');
+            $steps[] = new Given('I click on "' . get_string('duplicate') . '" "link" in the "' . $activity . '" activity');
+            $steps[] = new Given('I click on "' . get_string('yes') . '" "button" in the "Confirm" "dialogue"');
+        } else {
+            $steps[] = new Given('I click on "' . get_string('duplicate') . '" "link" in the "' . $activity . '" activity');
+            $steps[] = new Given('I press "' . get_string('continue') . '"');
+            $steps[] = new Given('I press "' . get_string('duplicatecontcourse') . '"');
         }
-        $steps[] = new Given('I click on "' . get_string('duplicate') . '" "link" in the "' . $activity . '" activity');
-        if (!$this->running_javascript()) {
-            $steps[] = new Given('I press "' . get_string('continue') .'"');
-            $steps[] = new Given('I press "' . get_string('duplicatecontcourse') .'"');
-        }
+
         return $steps;
     }
 
@@ -778,7 +783,7 @@ class behat_course extends behat_base {
             $steps[] = new Given('I click on "' . get_string('editsettings') . '" "link" in the "' . $this->escape($duplicatedxpath) . '" "xpath_element"');
         } else {
             $steps[] = new Given('I click on "' . get_string('duplicate') . '" "link" in the "' . $activity . '" activity');
-            $steps[] = new Given('I press "' . get_string('continue') .'"');
+            $steps[] = new Given('I press "' . get_string('continue') . '"');
             $steps[] = new Given('I press "' . get_string('duplicatecontedit') . '"');
         }
         $steps[] = new Given('I set the following fields to these values:', $data);
