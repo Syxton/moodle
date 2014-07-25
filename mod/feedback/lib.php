@@ -895,6 +895,15 @@ function feedback_get_incomplete_users($cm,
     }
     $allusers = array_keys($allusers);
 
+    // Get only users from groups in selected grouping.
+    if (!empty($cm->groupingid) && !empty($cm->groupmembersonly) && empty($group)) {
+        $groupingusers = groups_get_grouping_members($cm->groupingid, $fields);
+        $groupingusers = array_keys($groupingusers);
+
+        // Filter out users that are not in the selected grouping.
+        $allusers = array_intersect($allusers, $groupingusers);
+    }
+
     //now get all completeds
     $params = array('feedback'=>$cm->instance);
     if (!$completedusers = $DB->get_records_menu('feedback_completed', $params, '', 'userid,id')) {
