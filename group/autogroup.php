@@ -166,14 +166,23 @@ if ($editform->is_cancelled()) {
             $table->width = '90%';
         }
         $table->data  = array();
+        $processednames = array();
 
         foreach ($groups as $group) {
             $line = array();
+            if (strstr($data->namingscheme, '$') !== false) { // If the $ character exists in the naming scheme.
+                // Replace $ character with a student name.
+                $group['name'] = str_replace('$', fullname(current($group['members'])), $data->namingscheme);
+            }
             if (groups_get_group_by_name($courseid, $group['name'])) {
                 $line[] = '<span class="notifyproblem">'.get_string('groupnameexists', 'group', $group['name']).'</span>';
                 $error = get_string('groupnameexists', 'group', $group['name']);
+            } else if (in_array($group['name'], $processednames)) {
+                $line[] = '<span class="notifyproblem">'.get_string('groupnameduplicate', 'group', $group['name']).'</span>';
+                $error = get_string('groupnameduplicate', 'group', $group['name']);
             } else {
                 $line[] = $group['name'];
+                $processednames[] = $group['name'];
             }
             if ($data->allocateby != 'no') {
                 $unames = array();
@@ -192,6 +201,7 @@ if ($editform->is_cancelled()) {
         $grouping = null;
         $createdgrouping = null;
         $createdgroups = array();
+        $processednames = array();
         $failed = false;
 
         // prepare grouping
@@ -209,16 +219,25 @@ if ($editform->is_cancelled()) {
 
         // Save the groups data
         foreach ($groups as $key=>$group) {
+            if (strstr($data->namingscheme, '$') !== false) { // If the $ character exists in the naming scheme.
+                // Replace $ character with a student name.
+                $group['name'] = str_replace('$', fullname(current($group['members'])), $data->namingscheme);
+            }
             if (groups_get_group_by_name($courseid, $group['name'])) {
                 $error = get_string('groupnameexists', 'group', $group['name']);
+                $failed = true;
+                break;
+            } else if (in_array($group['name'], $processednames)) {
+                $error = get_string('groupnameduplicate', 'group', $group['name']);
                 $failed = true;
                 break;
             }
             $newgroup = new stdClass();
             $newgroup->courseid = $data->courseid;
-            $newgroup->name     = $group['name'];
+            $newgroup->name = $group['name'];
             $groupid = groups_create_group($newgroup);
             $createdgroups[] = $groupid;
+            $processednames[] = $group['name'];
             foreach($group['members'] as $user) {
                 groups_add_member($groupid, $user->id);
             }
