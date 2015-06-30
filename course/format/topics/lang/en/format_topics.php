@@ -24,9 +24,11 @@
  */
 
 $string['currentsection'] = 'This topic';
+$string['editsection'] = 'Edit topic';
 $string['deletesection'] = 'Delete topic';
 $string['sectionname'] = 'Topic';
 $string['pluginname'] = 'Topics format';
+$string['sectionactions'] = 'Topic actions';
 $string['section0name'] = 'General';
 $string['page-course-view-topics'] = 'Any course main page in topics format';
 $string['page-course-view-topics-x'] = 'Any course page in topics format';

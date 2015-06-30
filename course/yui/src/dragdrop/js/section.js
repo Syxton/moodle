@@ -75,9 +75,19 @@ Y.extend(DRAGSECTION, M.core.dragdrop, {
                     cssleft.appendChild(this.get_drag_handle(title, CSS.SECTIONHANDLE, 'icon', true));
 
                     if (moveup) {
+                        if (moveup.previous('br')) {
+                            moveup.previous('br').remove();
+                        } else if (moveup.next('br')) {
+                            moveup.next('br').remove();
+                        }
                         moveup.remove();
                     }
                     if (movedown) {
+                        if (movedown.previous('br')) {
+                            movedown.previous('br').remove();
+                        } else if (movedown.next('br')) {
+                            movedown.next('br').remove();
+                        }
                         movedown.remove();
                     }
 
