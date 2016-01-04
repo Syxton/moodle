@@ -189,17 +189,24 @@ class edit_item_form extends moodleform {
         $mform->disabledIf('aggregationcoef2', 'gradetype', 'eq', GRADE_TYPE_TEXT);
 
         $options = array();
-        $coefstring = '';
         $categories = grade_category::fetch_all(array('courseid'=>$COURSE->id));
 
         foreach ($categories as $cat) {
             $cat->apply_forced_settings();
             $options[$cat->id] = $cat->get_name();
+            if (!$cat->is_aggregationcoef_used()) {
+                $mform->disabledIf('aggregationcoef', 'parentcategory', 'eq', $cat->id);
+            }
         }
 
         if (count($categories) > 1) {
             $mform->addElement('select', 'parentcategory', get_string('gradecategory', 'grades'), $options);
         }
+
+        $mform->addElement('checkbox', 'aggregationcoef', get_string('aggregationcoefextrasum', 'grades'));
+        $mform->addHelpButton('aggregationcoef', 'aggregationcoefextrasum', 'grades');
+        $mform->disabledIf('aggregationcoef', 'gradetype', 'eq', GRADE_TYPE_NONE);
+        $mform->disabledIf('aggregationcoef', 'gradetype', 'eq', GRADE_TYPE_TEXT);
 
 /// hidden params
         $mform->addElement('hidden', 'id', 0);
@@ -285,28 +292,6 @@ class edit_item_form extends moodleform {
                 if ($mform->elementExists('aggregationcoef')) {
                     $mform->removeElement('aggregationcoef');
                 }
-
-            } else {
-                $coefstring = $grade_item->get_coefstring();
-
-                if ($coefstring !== '') {
-                    if ($coefstring == 'aggregationcoefextrasum' || $coefstring == 'aggregationcoefextraweightsum') {
-                        // advcheckbox is not compatible with disabledIf!
-                        $coefstring = 'aggregationcoefextrasum';
-                        $element =& $mform->createElement('checkbox', 'aggregationcoef', get_string($coefstring, 'grades'));
-                    } else {
-                        $element =& $mform->createElement('text', 'aggregationcoef', get_string($coefstring, 'grades'));
-                    }
-                    if ($mform->elementExists('parentcategory')) {
-                        $mform->insertElementBefore($element, 'parentcategory');
-                    } else {
-                        $mform->insertElementBefore($element, 'id');
-                    }
-                    $mform->addHelpButton('aggregationcoef', $coefstring, 'grades');
-                }
-                $mform->disabledIf('aggregationcoef', 'gradetype', 'eq', GRADE_TYPE_NONE);
-                $mform->disabledIf('aggregationcoef', 'gradetype', 'eq', GRADE_TYPE_TEXT);
-                $mform->disabledIf('aggregationcoef', 'parentcategory', 'eq', $parent_category->id);
             }
 
             // Remove fields used by natural weighting if the parent category is not using natural weighting.
