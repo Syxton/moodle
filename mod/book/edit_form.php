@@ -29,7 +29,7 @@ require_once($CFG->libdir.'/formslib.php');
 class book_chapter_edit_form extends moodleform {
 
     function definition() {
-        global $CFG;
+        global $CFG, $DB, $COURSE;
 
         $chapter = $this->_customdata['chapter'];
         $options = $this->_customdata['options'];
@@ -53,10 +53,28 @@ class book_chapter_edit_form extends moodleform {
         $mform->addRule('title', null, 'required', null, 'client');
 
         $mform->addElement('advcheckbox', 'subchapter', get_string('subchapter', 'mod_book'), $disabledmsg);
+        
+        $modinfo = get_fast_modinfo($COURSE->id);
+        $cms = $modinfo->get_cms();
+        $pagenames = array();
+        foreach($cms as $cm) {
+            if ($cm->modname == "page") {
+                $pagenames[$cm->id] = $cm->name;
+            }
+        }
+        
+        if (!empty($pagenames)) {
+            core_collator::asort($pagenames);
+            $mform->addElement('select', 'pagelink', 'Use Page as Content', array("None") + $pagenames);
+            $mform->setType('pagelink', PARAM_INT);
+        }
 
         $mform->addElement('editor', 'content_editor', get_string('content', 'mod_book'), null, $options);
         $mform->setType('content_editor', PARAM_RAW);
-        $mform->addRule('content_editor', get_string('required'), 'required', null, 'client');
+
+        if (empty($pagenames)) {
+            $mform->addRule('content_editor', null, 'required', null, 'client');
+        }
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);

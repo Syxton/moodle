@@ -203,6 +203,19 @@ book_view($book, $chapter, $islastchapter, $course, $cm, $context);
 // Book display HTML code
 // =====================================================
 
+if (!empty($chapter->pagelink)) {
+    $pageinfo = get_fast_modinfo($course);
+    if (!$pcm = $pageinfo->get_cm($chapter->pagelink)) {
+        print_error('invalidcoursemodule');
+    }
+    $page = $DB->get_record('page', array('id' => $pcm->instance), '*', MUST_EXIST);
+    $context = context_module::instance($pcm->id);
+    require_capability('mod/page:view', $context);
+
+    // Completion and trigger events.
+    page_view($page, $course, $pcm, $context);    
+}
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($book->name));
 
@@ -217,19 +230,48 @@ if ($book->navstyle) {
 $hidden = $chapter->hidden ? ' dimmed_text' : null;
 echo $OUTPUT->box_start('generalbox book_content' . $hidden);
 
-if (!$book->customtitles) {
-    if (!$chapter->subchapter) {
-        $currtitle = book_get_chapter_title($chapter->id, $chapters, $book, $context);
-        echo $OUTPUT->heading($currtitle, 3);
+if (empty($chapter->pagelink)) {
+    if (!$book->customtitles) {
+        if (!$chapter->subchapter) {
+            $currtitle = book_get_chapter_title($chapter->id, $chapters, $book, $context);
+            echo $OUTPUT->heading($currtitle, 3);
+        } else {
+            $currtitle = book_get_chapter_title($chapters[$chapter->id]->parent, $chapters, $book, $context);
+            $currsubtitle = book_get_chapter_title($chapter->id, $chapters, $book, $context);
+            echo $OUTPUT->heading($currtitle, 3);
+            echo $OUTPUT->heading($currsubtitle, 4);
+        }
+    }
+    
+    $chaptertext = file_rewrite_pluginfile_urls($chapter->content, 'pluginfile.php', $context->id, 'mod_book', 'chapter', $chapter->id);
+    echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context));    
+} else {
+    if ($pcm->uservisible) {
+        if (!$book->customtitles) {
+            if (!$chapter->subchapter) {
+                $currtitle = book_get_chapter_title($chapter->id, $chapters, $book, $context);
+                echo $OUTPUT->heading($currtitle, 3);
+            } else {
+                $currtitle = book_get_chapter_title($chapters[$chapter->id]->parent, $chapters, $book, $context);
+                $currsubtitle = book_get_chapter_title($chapter->id, $chapters, $book, $context);
+                echo $OUTPUT->heading($currtitle, 3);
+                echo $OUTPUT->heading($currsubtitle, 4);
+            }
+        }
+                
+        $chaptertext = file_rewrite_pluginfile_urls($page->content, 'pluginfile.php', $context->id, 'mod_page', 'content', $page->revision);
+        echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context)); 
+        
+        $strlastmodified = get_string("lastmodified");
+        echo "<div class=\"modified\">$strlastmodified: ".userdate($page->timemodified)."</div>";
+    } else if ($pcm->availableinfo) {
+        // User cannot access the activity, but on the course page they will
+        // see a link to it, greyed-out, with information (HTML format) from
+        notice($pcm->availableinfo, $courseurl->out(false));
     } else {
-        $currtitle = book_get_chapter_title($chapters[$chapter->id]->parent, $chapters, $book, $context);
-        $currsubtitle = book_get_chapter_title($chapter->id, $chapters, $book, $context);
-        echo $OUTPUT->heading($currtitle, 3);
-        echo $OUTPUT->heading($currsubtitle, 4);
+        notice(get_string('nocontent', 'mod_book'));
     }
 }
-$chaptertext = file_rewrite_pluginfile_urls($chapter->content, 'pluginfile.php', $context->id, 'mod_book', 'chapter', $chapter->id);
-echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context));
 
 echo $OUTPUT->box_end();
 

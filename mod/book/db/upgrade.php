@@ -60,6 +60,21 @@ function xmldb_book_upgrade($oldversion) {
 
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
+    
+    if ($oldversion < 2016061300) {
+
+        // Define field navstyle to be added to book.
+        $table = new xmldb_table('book_chapters');
+        $field = new xmldb_field('pagelink', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Conditionally launch add field navstyle.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Book savepoint reached.
+        upgrade_mod_savepoint(true, 2016061300, 'book');
+    }
 
     return true;
 }

@@ -61,7 +61,10 @@ define ('BOOK_LINK_TEXT', '2');
  */
 function book_preload_chapters($book) {
     global $DB;
-    $chapters = $DB->get_records('book_chapters', array('bookid'=>$book->id), 'pagenum', 'id, pagenum, subchapter, title, hidden');
+    $chapters = $DB->get_records('book_chapters',
+                                 array('bookid' => $book->id),
+                                 'pagenum',
+                                 'id, pagenum, subchapter, title, hidden, pagelink');
     if (!$chapters) {
         return array();
     }
@@ -225,8 +228,16 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
             $i++;
             $title = trim(format_string($ch->title, true, array('context'=>$context)));
             $titleout = $title;
-            if (!$ch->subchapter) {
 
+            $pcm = false;
+            if ($ch->pagelink) {
+                $pageinfo = get_fast_modinfo($cm->course);
+                if (!$pcm = $pageinfo->get_cm($ch->pagelink)) {
+                    print_error('invalidcoursemodule');
+                }
+            }
+
+            if (!$ch->subchapter) {
                 if ($first) {
                     $toc .= html_writer::start_tag('li', array('class' => 'clearfix'));
                 } else {
@@ -313,6 +324,14 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
                                             $OUTPUT->pix_icon('add', get_string('addafter', 'mod_book'), 'mod_book'), array('title' => get_string('addafter', 'mod_book')));
             $toc .= html_writer::end_tag('div');
 
+            if ($pcm && !empty($pcm->availableinfo)) {
+                $toc .= html_writer::tag('div', $pcm->availableinfo, array('class' => 'dimmed_text', 'style' => 'margin-left: 10px;'));
+            }
+
+            if ($pcm && !$pcm->visible) {
+                $toc .= html_writer::tag('div', "Hidden Page", array('class' => 'dimmed_text', 'style' => 'margin-left: 10px;'));
+            }
+
             if (!$ch->subchapter) {
                 $toc .= html_writer::start_tag('ul');
             } else {
@@ -329,7 +348,16 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
         $toc .= html_writer::start_tag('ul');
         foreach ($chapters as $ch) {
             $title = trim(format_string($ch->title, true, array('context'=>$context)));
-            if (!$ch->hidden) {
+            
+            $pcm = false;
+            if ($ch->pagelink) {
+                $pageinfo = get_fast_modinfo($cm->course);
+                if (!$pcm = $pageinfo->get_cm($ch->pagelink)) {
+                    print_error('invalidcoursemodule');
+                }
+            }
+
+            if ((!$pcm && !$ch->hidden) || ($pcm && !$ch->hidden && ($pcm->uservisible || !empty($pcm->availableinfo)))) {
                 if (!$ch->subchapter) {
                     $nch++;
                     $ns = 0;
@@ -361,9 +389,19 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
                     }
                 }
                 if ($ch->id == $chapter->id) {
-                    $toc .= html_writer::tag('strong', $title);
+                    if ($pcm && !empty($pcm->availableinfo)) {
+                        $toc .= html_writer::tag('strong', $title, array('class' => 'dimmed_text'));  
+                    } else {
+                        $toc .= html_writer::tag('strong', $title);
+                    }
                 } else {
-                    $toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'chapterid' => $ch->id)), $title, array('title' => s($title)));
+                    if ($pcm && !empty($pcm->availableinfo)) {
+                        $availability = html_writer::tag('span', "($pcm->availableinfo)", array('style' => 'margin-left:5px;'));
+                        $toc .= html_writer::tag('span', s($title) . $availability, array('class' => 'dimmed_text'));   
+                    } else {
+                        $toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'chapterid' => $ch->id)),
+                                                  $title, array('title' => s($title)));
+                    }                    
                 }
 
                 if (!$ch->subchapter) {
