@@ -53,16 +53,16 @@ class book_chapter_edit_form extends moodleform {
         $mform->addRule('title', null, 'required', null, 'client');
 
         $mform->addElement('advcheckbox', 'subchapter', get_string('subchapter', 'mod_book'), $disabledmsg);
-        
+
         $modinfo = get_fast_modinfo($COURSE->id);
         $cms = $modinfo->get_cms();
         $pagenames = array();
-        foreach($cms as $cm) {
+        foreach ($cms as $cm) {
             if ($cm->modname == "page") {
                 $pagenames[$cm->id] = $cm->name;
             }
         }
-        
+
         if (!empty($pagenames)) {
             core_collator::asort($pagenames);
             $mform->addElement('select', 'pagelink', 'Use Page as Content', array("None") + $pagenames);

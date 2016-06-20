@@ -325,7 +325,9 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
             $toc .= html_writer::end_tag('div');
 
             if ($pcm && !empty($pcm->availableinfo)) {
-                $toc .= html_writer::tag('div', $pcm->availableinfo, array('class' => 'dimmed_text', 'style' => 'margin-left: 10px;'));
+                $toc .= html_writer::tag('div',
+                                         $pcm->availableinfo,
+                                         array('class' => 'dimmed_text', 'style' => 'margin-left: 10px;'));
             }
 
             if ($pcm && !$pcm->visible) {
@@ -348,7 +350,6 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
         $toc .= html_writer::start_tag('ul');
         foreach ($chapters as $ch) {
             $title = trim(format_string($ch->title, true, array('context'=>$context)));
-            
             $pcm = false;
             if ($ch->pagelink) {
                 $pageinfo = get_fast_modinfo($cm->course);
@@ -390,18 +391,18 @@ function book_get_toc($chapters, $chapter, $book, $cm, $edit) {
                 }
                 if ($ch->id == $chapter->id) {
                     if ($pcm && !empty($pcm->availableinfo)) {
-                        $toc .= html_writer::tag('strong', $title, array('class' => 'dimmed_text'));  
+                        $toc .= html_writer::tag('strong', $title, array('class' => 'dimmed_text'));
                     } else {
                         $toc .= html_writer::tag('strong', $title);
                     }
                 } else {
                     if ($pcm && !empty($pcm->availableinfo)) {
                         $availability = html_writer::tag('span', "($pcm->availableinfo)", array('style' => 'margin-left:5px;'));
-                        $toc .= html_writer::tag('span', s($title) . $availability, array('class' => 'dimmed_text'));   
+                        $toc .= html_writer::tag('span', s($title) . $availability, array('class' => 'dimmed_text'));
                     } else {
                         $toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'chapterid' => $ch->id)),
                                                   $title, array('title' => s($title)));
-                    }                    
+                    }
                 }
 
                 if (!$ch->subchapter) {

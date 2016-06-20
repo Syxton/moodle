@@ -60,7 +60,7 @@ function xmldb_book_upgrade($oldversion) {
 
     // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
-    
+
     if ($oldversion < 2016061300) {
 
         // Define field navstyle to be added to book.

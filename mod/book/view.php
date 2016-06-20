@@ -213,7 +213,7 @@ if (!empty($chapter->pagelink)) {
     require_capability('mod/page:view', $context);
 
     // Completion and trigger events.
-    page_view($page, $course, $pcm, $context);    
+    page_view($page, $course, $pcm, $context);
 }
 
 echo $OUTPUT->header();
@@ -242,9 +242,16 @@ if (empty($chapter->pagelink)) {
             echo $OUTPUT->heading($currsubtitle, 4);
         }
     }
-    
-    $chaptertext = file_rewrite_pluginfile_urls($chapter->content, 'pluginfile.php', $context->id, 'mod_book', 'chapter', $chapter->id);
-    echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context));    
+
+    $chaptertext = file_rewrite_pluginfile_urls($chapter->content,
+                                                'pluginfile.php',
+                                                $context->id,
+                                                'mod_book',
+                                                'chapter',
+                                                $chapter->id);
+    echo format_text($chaptertext,
+                     $chapter->contentformat,
+                     array('noclean' => true, 'overflowdiv' => true, 'context' => $context));
 } else {
     if ($pcm->uservisible) {
         if (!$book->customtitles) {
@@ -258,15 +265,22 @@ if (empty($chapter->pagelink)) {
                 echo $OUTPUT->heading($currsubtitle, 4);
             }
         }
-                
-        $chaptertext = file_rewrite_pluginfile_urls($page->content, 'pluginfile.php', $context->id, 'mod_page', 'content', $page->revision);
-        echo format_text($chaptertext, $chapter->contentformat, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context)); 
-        
+
+        $chaptertext = file_rewrite_pluginfile_urls($page->content,
+                                                    'pluginfile.php',
+                                                    $context->id,
+                                                    'mod_page',
+                                                    'content',
+                                                    $page->revision);
+        echo format_text($chaptertext,
+                         $chapter->contentformat,
+                         array('noclean' => true, 'overflowdiv' => true, 'context' => $context));
+
         $strlastmodified = get_string("lastmodified");
         echo "<div class=\"modified\">$strlastmodified: ".userdate($page->timemodified)."</div>";
     } else if ($pcm->availableinfo) {
         // User cannot access the activity, but on the course page they will
-        // see a link to it, greyed-out, with information (HTML format) from
+        // see a link to it, greyed-out, with information (HTML format).
         notice($pcm->availableinfo, $courseurl->out(false));
     } else {
         notice(get_string('nocontent', 'mod_book'));
