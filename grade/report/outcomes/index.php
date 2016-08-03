@@ -43,7 +43,7 @@ require_capability('gradereport/outcomes:view', $context);
 grade_regrade_final_grades_if_required($course);
 
 // Grab all outcomes used in course.
-$report_info = array();
+$reportinfo = array();
 $outcomes = grade_outcome::fetch_all_available($courseid);
 
 // Will exclude grades of suspended users if required.
@@ -56,12 +56,12 @@ if ($showonlyactiveenrol) {
 
 // Get grade_items that use each outcome.
 foreach ($outcomes as $outcomeid => $outcome) {
-    $report_info[$outcomeid]['items'] = $DB->get_records_select('grade_items', "outcomeid = ? AND courseid = ?", array($outcomeid, $courseid));
-    $report_info[$outcomeid]['outcome'] = $outcome;
+    $reportinfo[$outcomeid]['items'] = $DB->get_records_select('grade_items', "outcomeid = ? AND courseid = ?", array($outcomeid, $courseid));
+    $reportinfo[$outcomeid]['outcome'] = $outcome;
 
     // Get average grades for each item.
-    if (is_array($report_info[$outcomeid]['items'])) {
-        foreach ($report_info[$outcomeid]['items'] as $itemid => $item) {
+    if (is_array($reportinfo[$outcomeid]['items'])) {
+        foreach ($reportinfo[$outcomeid]['items'] as $itemid => $item) {
             $params = array();
             $hidesuspendedsql = '';
             if ($showonlyactiveenrol && !empty($suspendedusers)) {
@@ -78,7 +78,7 @@ foreach ($outcomes as $outcomeid => $outcome) {
             $info = $DB->get_records_sql($sql, $params);
 
             if (!$info) {
-                unset($report_info[$outcomeid]['items'][$itemid]);
+                unset($reportinfo[$outcomeid]['items'][$itemid]);
                 continue;
             } else {
                 $info = reset($info);
@@ -86,8 +86,8 @@ foreach ($outcomes as $outcomeid => $outcome) {
                 $count = $info->count;
             }
 
-            $report_info[$outcomeid]['items'][$itemid]->avg = $avg;
-            $report_info[$outcomeid]['items'][$itemid]->count = $count;
+            $reportinfo[$outcomeid]['items'][$itemid]->avg = $avg;
+            $reportinfo[$outcomeid]['items'][$itemid]->count = $count;
         }
     }
 }
@@ -101,7 +101,7 @@ $html .= '<th class="header c4" scope="col">' . get_string('average', 'grades') 
 $html .= '<th class="header c5" scope="col">' . get_string('numberofgrades', 'grades') . '</th></tr>' . "\n";
 
 $row = 0;
-foreach ($report_info as $outcomeid => $outcomedata) {
+foreach ($reportinfo as $outcomeid => $outcomedata) {
     $rowspan = count($outcomedata['items']);
     // If there are no items for this outcome, rowspan will equal 0, which is not good.
     if ($rowspan == 0) {
@@ -175,6 +175,15 @@ $html .= '</table>';
 print_grade_page_head($courseid, 'report', 'outcomes');
 
 echo $html;
+
+echo $OUTPUT->container_start('buttons');
+if ( !empty($reportinfo) ) {
+    echo $OUTPUT->single_button(new moodle_url('export.php',
+                                               array('id' => $courseid,
+                                                     'sesskey' => sesskey())),
+                                get_string('exportalloutcomes', 'grades'));
+}
+echo $OUTPUT->container_end();
 
 $event = \gradereport_outcomes\event\grade_report_viewed::create(
     array(
