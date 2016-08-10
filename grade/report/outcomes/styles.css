@@ -1,0 +1,27 @@
+/**
+ * The table.
+ */
+table.sub_table {
+    height: 100%;
+}
+table.sub_table tbody>tr:nth-child(odd) {
+    background-color: #fff;
+}
+table.sub_table tbody>tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+table.sub_table td {
+    border: none !important;
+    background-color: initial !important;
+}
+table.sub_table .top_border {
+    border-top: 1px solid #ddd;
+}
+.outcomes_main {
+    background-color: initial !important;
+}
+.outcomes_sub {
+    height: 0px;
+    padding: 0 !important;
+    background-color: initial !important;
+}
