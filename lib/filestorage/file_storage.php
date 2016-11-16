@@ -375,7 +375,14 @@ class file_storage {
         // Safety.
         $newtmpfile = $tmp . '/' . clean_param($newtmpfile, PARAM_FILE);
 
+        // Page limiter.
+        $pagelimit = "";
+        if (!empty($CFG->unoconvpagelimit)) {
+            $pagelimit = '-e PageRange=1-' . $CFG->unoconvpagelimit;
+        }
+
         $cmd = escapeshellcmd(trim($CFG->pathtounoconv)) . ' ' .
+               escapeshellarg($pagelimit) . ' ' .
                escapeshellarg('-f') . ' ' .
                escapeshellarg($format) . ' ' .
                escapeshellarg('-o') . ' ' .
