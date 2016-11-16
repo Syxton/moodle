@@ -49,6 +49,10 @@ $systempathlink = html_writer::link($systempathslink, get_string('systempaths', 
 $settings->add(new admin_setting_heading('pathtounoconv', get_string('pathtounoconv', 'admin'),
     get_string('pathtounoconvpathdesc', 'assignfeedback_editpdf', $systempathlink)));
 
+$settings->add(new admin_setting_configtext('unoconvpagelimit',
+    get_string('unoconvpagelimit', 'admin'),
+    get_string('unoconvpagelimitdesc', 'admin'), 0, PARAM_INT));
+
 $url = new moodle_url('/mod/assign/feedback/editpdf/testunoconv.php');
 $link = html_writer::link($url, get_string('test_unoconv', 'assignfeedback_editpdf'));
 $settings->add(new admin_setting_heading('test_unoconv', '', $link));
