@@ -1807,6 +1807,7 @@ function purify_html($text, $options = array()) {
         $config->set('Core.Encoding', 'UTF-8');
         $config->set('HTML.Doctype', 'XHTML 1.0 Transitional');
         $config->set('URI.AllowedSchemes', array(
+            'data' => true,
             'http' => true,
             'https' => true,
             'ftp' => true,
