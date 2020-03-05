@@ -980,6 +980,22 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
             echo html_writer::link($url, $icon . $straddsections,
                 array('class' => 'add-sections', 'data-add-sections' => $straddsections, 'new-sections' => $newsections));
             echo html_writer::end_tag('div');
+
+            echo html_writer::start_tag('div', array('id' => 'deleteemptysections', 'class' => 'mdl-right'));
+            if (get_string_manager()->string_exists('deleteemptysections', 'format_'.$course->format)) {
+                $strdelemptysections = get_string('deleteemptysections', 'format_'.$course->format);
+            } else {
+                $strdelemptysections = get_string('deleteemptysections');
+            }
+            $url = new moodle_url('/course/deleteemptysections.php',
+              ['courseid' => $course->id, 'sesskey' => sesskey()]);
+            if ($sectionreturn !== null) {
+                $url->param('sectionreturn', $sectionreturn);
+            }
+            $icon = $this->output->pix_icon('t/delete', $strdelemptysections);
+            echo html_writer::link($url, $icon . $strdelemptysections,
+              array('class' => 'delete-empty-sections', 'data-delete-empty-sections' => $strdelemptysections));
+            echo html_writer::end_tag('div');
         }
     }
 

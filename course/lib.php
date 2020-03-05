@@ -572,6 +572,30 @@ function get_module_types_names($plural = false) {
 }
 
 /**
+ * Deletes all empty sections in a course.
+ *
+ * @param object $course course object
+ * @return bool true if successful deletion of all empty sections
+ */
+function course_delete_empty_sections(object $course) {
+    global $DB;
+
+    if (!$sections = $DB->get_records('course_sections', array('course' => $course->id),
+            'section DESC', 'id, section')) {
+        return false;
+    }
+
+    foreach ($sections as $section) {
+        // Now delete this section.
+        course_delete_section($course->id, $section->section, false);
+    }
+
+    rebuild_course_cache($course->id, true);
+
+    return true;
+}
+
+/**
  * Set highlighted section. Only one section can be highlighted at the time.
  *
  * @param int $courseid course id
