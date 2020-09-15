@@ -114,7 +114,8 @@ class EvalMath {
         'average'=>array(-1), 'max'=>array(-1),  'min'=>array(-1),
         'mod'=>array(2),      'pi'=>array(0),    'power'=>array(2),
         'round'=>array(1, 2), 'sum'=>array(-1), 'rand_int'=>array(2),
-        'rand_float'=>array(0), 'ifthenelse'=>array(3), 'cond_and'=>array(-1), 'cond_or'=>array(-1));
+        'rand_float'=>array(0), 'ifthenelse'=>array(3), 'cond_and'=>array(-1), 'cond_or'=>array(-1),
+        'keep'=>array(-1), 'drop'=>array(-1));
     var $fcsynonyms = array('if' => 'ifthenelse', 'and' => 'cond_and', 'or' => 'cond_or');
 
     var $allowimplicitmultiplication;
@@ -641,5 +642,37 @@ class EvalMathFuncs {
     static function rand_float() {
         $randomvalues = unpack('v', md5(self::get_random_seed(), true));
         return array_shift($randomvalues) / 65536;
+    }
+
+    static function keep() {
+        $args = func_get_args();
+        $keep = array_shift($args);
+        $drop = count($args) - $keep;
+        asort($args);
+        for ($i = 0; $i < $drop; $i++) {
+            array_shift($args);
+        }
+
+        $res = 0;
+        foreach($args as $a) {
+           $res += $a;
+        }
+        return $res;
+    }
+
+    static function drop() {
+        $args = func_get_args();
+        $drop = array_shift($args);
+
+        asort($args);
+        for ($i = 0; $i < $drop; $i++) {
+            array_shift($args);
+        }
+
+        $res = 0;
+        foreach($args as $a) {
+           $res += $a;
+        }
+        return $res;
     }
 }
