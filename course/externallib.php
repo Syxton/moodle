@@ -4131,7 +4131,7 @@ class core_course_external extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function get_enrolled_users_by_cmid(int $cmid, int $groupid = 0) {
-    global $PAGE;
+    global $CFG, $PAGE;
         $warnings = [];
 
         [
@@ -4146,7 +4146,11 @@ class core_course_external extends external_api {
         $coursecontext = context_course::instance($course->id);
         self::validate_context($coursecontext);
 
-        $enrolledusers = get_enrolled_users($coursecontext, '', $groupid);
+        $defaultgradeshowactiveenrol = !empty($CFG->grade_report_showonlyactiveenrol);
+        $showonlyactiveenrol = get_user_preferences('grade_report_showonlyactiveenrol', $defaultgradeshowactiveenrol);
+        $showonlyactiveenrol = $showonlyactiveenrol || !has_capability('moodle/course:viewsuspendedusers', $coursecontext);
+
+        $enrolledusers = get_enrolled_users($coursecontext, '', $groupid, 'u.*', null, 0, 0, $showonlyactiveenrol);
 
         $users = array_map(function ($user) use ($PAGE) {
             $user->fullname = fullname($user);
