@@ -378,4 +378,22 @@ echo $OUTPUT->download_dataformat_selector(get_string('exportgroupsgroupings', '
     'grouping' => $groupingid,
 ]);
 
+echo "<br />";
+echo html_writer::link(new moodle_url('exportoverview.php', [
+        'type' => 'checkboxes',
+        'id' => $courseid,
+        'groupid' => $groupid,
+        'groupingid' => $groupingid,
+    ]),
+    'Export .CSV in checkbox format');
+
+echo "<br />";
+echo html_writer::link(new moodle_url('exportoverview.php', [
+    'type' => 'banner',
+    'id' => $courseid,
+    'groupid' => $groupid,
+    'groupingid' => $groupingid,
+    ]),
+    'Export .CSV with Name / BannerID');
+
 echo $OUTPUT->footer();
