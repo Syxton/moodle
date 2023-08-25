@@ -3548,7 +3548,7 @@ class assign {
                                                   $component,
                                                   $filearea,
                                                   $submissionid);
-        $params = array('overflowdiv' => true, 'context' => $this->get_context());
+        $params = array('noclean' => true, 'overflowdiv' => true, 'context' => $this->get_context());
         $result .= format_text($finaltext, $format, $params);
 
         if ($CFG->enableportfolios && has_capability('mod/assign:exportownsubmission', $this->context)) {
