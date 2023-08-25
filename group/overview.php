@@ -380,4 +380,10 @@ echo $OUTPUT->download_dataformat_selector(get_string('exportgroupsgroupings', '
     'grouping' => $groupingid,
 ]);
 
+echo html_writer::link(new moodle_url('exportoverview.php',
+                                          array('id' => $courseid,
+                                                'groupid' => $groupid,
+                                                'groupingid' => $groupingid)),
+                                          'Download groups and groupings as condensed format CSV');
+
 echo $OUTPUT->footer();

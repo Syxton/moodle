@@ -1957,7 +1957,7 @@ class file_storage {
         if ($decoded === false) {
             throw new file_reference_exception(null, $str, null, null, 'Invalid base64 format');
         }
-        $params = unserialize_array($decoded);
+        $params = @unserialize($decoded);
         if ($params === false) {
             throw new file_reference_exception(null, $decoded, null, null, 'Not an unserializeable value');
         }

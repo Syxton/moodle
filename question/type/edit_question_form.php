@@ -287,6 +287,40 @@ abstract class question_edit_form extends question_wizard_form {
             }
         }
 
+        $question_attempted = false;
+        $question_in_quiz = false;
+        $multiple_use = false;
+        if (!empty($this->question->id)) {
+            // Check to see if question is in use and if has been attempted.
+            $qubaid = new qubaid_join('{quiz_attempts} quiza', 'quiza.uniqueid', 'quiza.preview = 0');
+            $question_attempted = question_engine::questions_in_use(array($this->question->id), $qubaid);
+            $questiondata = question_bank::load_question($this->question->id);
+            $usage_count = \qbank_usage\helper::get_question_entry_usage_count($questiondata);
+            $multiple_use =  $usage_count > 1 ? true : false;
+        }
+
+        if ($question_attempted || $multiple_use) {
+            if ($question_attempted) {
+                $warningarray[] = $mform->addElement('html', '<div class="alert alert-danger">
+                                                                    <strong>
+                                                                        WARNING: This question has already been attempted. Any
+                                                                        changes will affect the quiz, but will not regrade the
+                                                                        attempt.
+                                                                    </strong>
+                                                              </div>');
+            }
+            if ($multiple_use) {
+                $warningarray[] = $mform->addElement('html', '<div class="alert alert-danger">
+                                                                    <strong>
+                                                                        WARNING: This question is used in more than one activity.
+                                                                        Any changes will affect all activities using this question.
+                                                                    </strong>
+                                                              </div>');
+            }
+            $mform->addGroup($warningarray, 'attemptwarning', '', array(' '), false);
+            $mform->closeHeaderBefore('attemptwarning');
+        }
+
         $mform->addGroup($buttonarray, 'updatebuttonar', '', array(' '), false);
         $mform->closeHeaderBefore('updatebuttonar');
 
