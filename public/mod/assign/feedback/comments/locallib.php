@@ -429,18 +429,20 @@ class assign_feedback_comments extends assign_feedback_plugin {
     public function view_summary(stdClass $grade, & $showviewlink) {
         $feedbackcomments = $this->get_feedback_comments($grade->id);
         if ($feedbackcomments) {
+            $options = new stdClass();
+            $options->context = $this->assignment->get_context();
+            $options->noclean = true;
             $text = $this->rewrite_feedback_comments_urls($feedbackcomments->commenttext, $grade->id);
             $text = format_text(
                 $text,
                 $feedbackcomments->commentformat,
-                [
-                    'context' => $this->assignment->get_context()
-                ]
+                $options
             );
 
             // Show the view all link if the text has been shortened.
             $short = shorten_text($text, 140);
-            $showviewlink = $short != $text;
+            $showviewlink = $short !== $text ||
+                            preg_match('/' . implode('|', ["iframe", "embed", "object"]) . '/', $text);
             return $short;
         }
         return '';
@@ -455,13 +457,14 @@ class assign_feedback_comments extends assign_feedback_plugin {
     public function view(stdClass $grade) {
         $feedbackcomments = $this->get_feedback_comments($grade->id);
         if ($feedbackcomments) {
+            $options = new stdClass();
+            $options->context = $this->assignment->get_context();
+            $options->noclean = true;
             $text = $this->rewrite_feedback_comments_urls($feedbackcomments->commenttext, $grade->id);
             $text = format_text(
                 $text,
                 $feedbackcomments->commentformat,
-                [
-                    'context' => $this->assignment->get_context()
-                ]
+                $options
             );
 
             return $text;
@@ -663,6 +666,7 @@ class assign_feedback_comments extends assign_feedback_plugin {
         global $COURSE;
 
         return [
+            'noclean' => true,
             'subdirs' => 1,
             'maxbytes' => $COURSE->maxbytes,
             'accepted_types' => '*',

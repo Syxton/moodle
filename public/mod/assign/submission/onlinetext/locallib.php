@@ -192,7 +192,7 @@ class assign_submission_onlinetext extends assign_submission_plugin {
      */
     private function get_edit_options() {
         $editoroptions = array(
-            'noclean' => false,
+            'noclean' => true,
             'maxfiles' => EDITOR_UNLIMITED_FILES,
             'maxbytes' => $this->assignment->get_course()->maxbytes,
             'context' => $this->assignment->get_context(),
@@ -610,7 +610,7 @@ class assign_submission_onlinetext extends assign_submission_plugin {
             $wordcount = count_words(trim($onlinetextsubmission->onlinetext));
             // Check if the online text submission contains video, audio or image elements
             // that can be ignored and stripped by count_words().
-            $hasinsertedresources = preg_match('/<\s*((video|audio)[^>]*>(.*?)<\s*\/\s*(video|audio)>)|(img[^>]*>(.*?))/',
+            $hasinsertedresources = preg_match('/<\s*((video|audio|iframe(.*panoptoltibutton))[^>]*>(.*?)<\s*\/\s*(video|audio|iframe)>)|(img[^>]*>(.*?))/',
                     trim($onlinetextsubmission->onlinetext));
         }
 
@@ -637,7 +637,7 @@ class assign_submission_onlinetext extends assign_submission_plugin {
             $wordcount = count_words(trim((string)$data->onlinetext_editor['text']));
             // Check if the online text submission contains video, audio or image elements
             // that can be ignored and stripped by count_words().
-            $hasinsertedresources = preg_match('/<\s*((video|audio)[^>]*>(.*?)<\s*\/\s*(video|audio)>)|(img[^>]*>(.*?))/',
+            $hasinsertedresources = preg_match('/<\s*((video|audio|iframe(.*panoptoltibutton))[^>]*>(.*?)<\s*\/\s*(video|audio|iframe)>)|(img[^>]*>(.*?))/',
                     trim((string)$data->onlinetext_editor['text']));
         }
 
