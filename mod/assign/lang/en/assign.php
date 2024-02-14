@@ -473,6 +473,7 @@ $string['quickgrading_help'] = 'Quick grading allows you to assign grades (and o
 $string['relativedatessubmissiontimeleft'] = 'Calculated for each student';
 $string['removeallgroupoverrides'] = 'Delete all group overrides';
 $string['removealluseroverrides'] = 'Delete all user overrides';
+$string['revokeattempt'] = 'Revoke attempt';
 $string['reopenuntilpassincompatiblewithblindmarking'] = 'Reopen until pass option is incompatible with anonymous submissions, because the grades are not released to the gradebook until the student identities are revealed.';
 $string['requiresubmissionstatement'] = 'Require that students accept the submission statement';
 $string['requiresubmissionstatement_help'] = 'Require that students accept the submission statement for all submissions to this assignment.';

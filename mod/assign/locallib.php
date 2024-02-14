@@ -536,6 +536,10 @@ class assign {
             $this->process_add_attempt(required_param('userid', PARAM_INT));
             $action = 'redirect';
             $nextpageparams['action'] = 'grading';
+        } else if ($action == 'revokeattempt') {
+            $this->process_revoke_attempt(required_param('userid', PARAM_INT));
+            $action = 'redirect';
+            $nextpageparams['action'] = 'grading';
         } else if ($action == 'reverttodraft') {
             $this->process_revert_to_draft();
             $action = 'redirect';
@@ -8938,6 +8942,18 @@ class assign {
     }
 
     /**
+     * Check for a sess key and then call revoke_attempt.
+     *
+     * @param int $userid int The user to revoke the attempt for
+     * @return bool - true if successful.
+     */
+    protected function process_revoke_attempt($userid) {
+        require_sesskey();
+
+        return $this->revoke_attempt($userid);
+    }
+
+    /**
      * Add a new attempt for a user.
      *
      * @param int $userid int The user to add the attempt for
@@ -9000,6 +9016,77 @@ class assign {
         if (isset($flags->locked) && $flags->locked) { // May not exist.
             $this->process_unlock_submission($userid);
         }
+        return true;
+    }
+
+/**
+     * Revoke unused attempt and revert to previous submission.
+     *
+     * @param int $userid int The user to add the attempt for
+     * @return bool - true if successful.
+     */
+    protected function revoke_attempt($userid) {
+        global $DB;
+        require_capability('mod/assign:grade', $this->context);
+
+        if ($this->get_instance()->attemptreopenmethod == ASSIGN_ATTEMPT_REOPEN_METHOD_NONE) {
+            return false;
+        }
+
+        if ($this->get_instance()->teamsubmission) {
+            $unusedattempt = $this->get_group_submission($userid, 0, false);
+        } else {
+            $unusedattempt = $this->get_user_submission($userid, false);
+        }
+
+        if (!$unusedattempt) {
+            return false;
+        }
+
+        // Remove the submission record for the group/user.
+        if ($this->get_instance()->teamsubmission) {
+            $prevsubmission = $this->get_group_submission($userid, $unusedattempt->groupid, false, $unusedattempt->attemptnumber - 1);
+
+            $grouplist = [];
+            $members = groups_get_members($unusedattempt->groupid);
+            foreach ($members as $member) {
+                $grouplist[] = $member->id;
+            }
+
+            $sql = 'DELETE FROM {assign_submission}
+                          WHERE status = "reopened"
+                            AND assignment = :assignment
+                            AND (groupid = :groupid OR userid IN (' . implode(',', $grouplist) . '))';
+            $DB->execute($sql, ['groupid' => $unusedattempt->groupid, 'assignment' => $unusedattempt->assignment]);
+
+            $sql = 'UPDATE {assign_submission}
+                       SET latest = 1
+                     WHERE assignment = :assignment
+                       AND (userid IN (' . implode(',', $grouplist) . '))';
+            $DB->execute($sql, ['assignment' => $unusedattempt->assignment]);
+        } else {
+            $prevsubmission = $this->get_user_submission($userid, false, $unusedattempt->attemptnumber - 1);
+
+            $sql = 'DELETE FROM {assign_submission}
+                          WHERE id = :id
+                            AND latest = 1';
+            $DB->execute($sql, ['id' => $unusedattempt->id]);
+
+            // Set previous submission to latest.
+            $DB->set_field('assign_submission', 'latest', 1, ['id' => $prevsubmission->id]);
+        }
+
+        // Give each submission plugin a chance to process the revoke_attempt.
+        $plugins = $this->get_submission_plugins();
+        foreach ($plugins as $plugin) {
+            if ($plugin->is_enabled() && $plugin->is_visible()) {
+                // Check if method exists.
+                if (method_exists($plugin, 'revoke_attempt')) {
+                    $plugin->revoke_attempt($prevsubmission, $unusedattempt);
+                }
+            }
+        }
+
         return true;
     }
 
