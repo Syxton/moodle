@@ -490,7 +490,6 @@ $string['requiresubmissionstatement'] = 'Require that students accept the submis
 $string['requiresubmissionstatement_help'] = 'Require that students accept the submission statement for all submissions to this assignment.';
 $string['requireallteammemberssubmit'] = 'Require all group members submit';
 $string['requireallteammemberssubmit_help'] = 'This setting must be used together with the \'Require students to click the submit button\' in Submission settings.
-
 If enabled, all group members must click the submit button for the group submission to be considered as submitted. If disabled, any group member can click the submit button.';
 $string['recordid'] = 'Identifier';
 $string['removesubmission'] = 'Remove submission';
@@ -507,6 +506,7 @@ $string['reverttodraftforstudent'] = 'Revert submission to draft for student: (i
 $string['reverttodraft'] = 'Revert the submission to draft status';
 $string['reverttodraftshort'] = 'Revert the submission to draft';
 $string['reviewed'] = 'Reviewed';
+$string['revokeattempt'] = 'Revoke attempt';
 $string['save'] = 'Save';
 $string['saveallquickgradingchanges'] = 'Save all quick grading changes';
 $string['saveandcontinue'] = 'Save and continue';

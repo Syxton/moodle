@@ -135,6 +135,15 @@ abstract class assign_submission_plugin extends assign_plugin {
     }
 
     /**
+     * Carry out any extra processing required to revoke the unused attempt given to the student.
+     * (i.e. when the submission is "reopened"
+     * @param stdClass $prevsubmission The previous attempt
+     * @param stdClass $unusedattempt The new attempt
+     */
+    public function revoke_attempt(stdClass $prevsubmission, stdClass $unusedattempt) {
+    }
+
+    /**
      * Determine if a submission is empty
      *
      * This is distinct from is_empty in that it is intended to be used to
