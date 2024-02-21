@@ -33,7 +33,7 @@ $string['anygrouping'] = '[Any grouping]';
 $string['autocreategroups'] = 'Auto-create groups';
 $string['backtogroupings'] = 'Back to groupings';
 $string['backtogroups'] = 'Back to groups';
-$string['badnamingscheme'] = 'Must contain exactly one \'@\' or one \'#\'  character';
+$string['badnamingscheme'] = 'Must contain exactly one \'@\' or one \'#\' or one \'$\' character';
 $string['byfirstname'] = 'Alphabetically by first name, last name';
 $string['byidnumber'] = 'Alphabetically by ID number';
 $string['bylastname'] = 'Alphabetically by last name, first name';
@@ -127,6 +127,7 @@ $string['groupmodeforce_help'] = 'The group mode is enforced for all activities 
 $string['groupmy'] = 'My group';
 $string['groupname'] = 'Group name';
 $string['groupnameexists'] = 'The group name \'{$a}\' already exists in this course, please choose another one.';
+$string['groupnameduplicate'] = 'The group name \'{$a}\' is not unique.';
 $string['groupnotamember'] = 'Sorry, you are not a member of that group';
 $string['groups'] = 'Groups';
 $string['groupscount'] = 'Groups ({$a})';
@@ -156,7 +157,9 @@ $string['membersofselectedgroup'] = 'Members of:';
 $string['namingscheme'] = 'Naming scheme';
 $string['namingscheme_help'] = 'The at symbol (@) may be used to create groups with names containing letters. For example Group @ will generate groups named Group A, Group B, Group C, ...
 
-The hash symbol (#) may be used to create groups with names containing numbers. For example Group # will generate groups named Group 1, Group 2, Group 3, ...';
+The hash symbol (#) may be used to create groups with names containing numbers. For example Group # will generate groups named Group 1, Group 2, Group 3, ...
+
+The dollar symbol ($) may be used to create groups with participants\' names as group names. If the \'Group/member count\' is set to more than 1, then groups will be named after the first group member.';
 $string['newgrouping'] = 'New grouping';
 $string['newpicture'] = 'New picture';
 $string['newpicture_help'] = 'Select an image in JPG or PNG format. The image will be cropped to a square and resized to 100x100 pixels.';

@@ -42,6 +42,32 @@ Feature: Automatic creation of groups
     And I expand all fieldsets
 
   @javascript
+  Scenario: Auto create groups with different naming schemes
+    Given I set the following fields to these values:
+      | Auto create based on | Number of groups |
+      | Group/member count | 2 |
+      | Grouping of auto-created groups | New grouping |
+      | Allocate members | Alphabetically by last name, first name |
+      | Grouping name | Grouping name |
+    And I press "Preview"
+    Then I should see "Group members"
+    And I should see "User count"
+    And I should see "Group A"
+    And I should see "Group B"
+    And I set the field "Naming scheme" to "Group #"
+    And I press "Preview"
+    Then I should see "Group members"
+    And I should see "User count"
+    And I should see "Group 1"
+    And I should see "Group 2"
+    And I set the field "Naming scheme" to "Group $"
+    And I press "Preview"
+    Then I should see "Group members"
+    And I should see "User count"
+    And I should see "Group Student 0"
+    And I should see "Group Student 5"
+
+  @javascript
   Scenario: Split automatically the course users in groups and add the groups to a new grouping
     Given I set the following fields to these values:
       | Auto create based on | Number of groups |
