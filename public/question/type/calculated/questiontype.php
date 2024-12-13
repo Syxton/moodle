@@ -1960,7 +1960,7 @@ function qtype_calculated_find_formula_errors($formula) {
 
     // Only mathematical operators are supported. Bitwise operators are not safe.
     // Note: In this context, ^ is a bitwise operator (exponents are represented by **).
-    $safeoperatorchar = '-+/*%>:\~<?=!';
+    $safeoperatorchar = '-+/*%>:\&\^\~<?=!';
     $operatorornumber = "[{$safeoperatorchar}.0-9eE]";
 
     // Validate mathematical functions in formula.
