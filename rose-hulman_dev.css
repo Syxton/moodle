@@ -983,3 +983,8 @@ a:not([class]):focus,
 	-webkit-box-shadow: 0 -0.2rem #929292, 0 0.2rem #929292;
 	box-shadow: 0 -0.2rem #929292, 0 0.2rem #929292;
 }
+
+/* Feedback comments CSS changes */
+.cm-type-assign .feedback .feedbacktable th {
+    width: 15em;
+}
